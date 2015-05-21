@@ -267,20 +267,20 @@ class ModelAccountOrder extends Model {
 	}	
 
 	public function cancelOrder($order_id) {
-		$this->db->query("update   `" . DB_PREFIX . "order`  SET order_status_id ='14' , date_modified = NOW()  WHERE order_id = '" . $order_id . "'  ");
+		$this->db->query("update   `my_order`  SET order_status_id ='14' , date_modified = NOW()  WHERE order_id = '" . $order_id . "'  ");
 
-		$this->db->query("INSERT INTO " . DB_PREFIX . "order_history SET order_id = '" . (int)$order_id . "', order_status_id = '1', notify = '1', comment = 'order canceled', date_added = NOW()");
+		$this->db->query("INSERT INTO my_order_history SET order_id = '" . (int)$order_id . "', order_status_id = '1', notify = '1', comment = 'order canceled', date_added = NOW()");
 
 
-		$order_product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
+		$order_product_query = $this->db->query("SELECT * FROM my_order_product WHERE order_id = '" . (int)$order_id . "'");
 		
 		foreach ($order_product_query->rows as $order_product) {
-			$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
+			$this->db->query("UPDATE my_product SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");
 			
-			$order_option_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product['order_product_id'] . "'");
+			$order_option_query = $this->db->query("SELECT * FROM my_order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product['order_product_id'] . "'");
 		
 			foreach ($order_option_query->rows as $option) {
-				$this->db->query("UPDATE " . DB_PREFIX . "product_option_value SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$option['product_option_value_id'] . "' AND subtract = '1'");
+				$this->db->query("UPDATE my_product_option_value SET quantity = (quantity + " . (int)$order_product['quantity'] . ") WHERE product_option_value_id = '" . (int)$option['product_option_value_id'] . "' AND subtract = '1'");
 			}
 		}
 

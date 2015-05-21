@@ -151,13 +151,13 @@ class ModelCheckoutOrder extends Model {
 
 	public function checkRollbackCredit($order_id) {
 		$this->load->model('checkout/pointcredit');
-		$credit_query = $this->db->query("SELECT credit,point from `" . DB_PREFIX . "customer` WHERE customer_id = '" . (int)$this->customer->getId() . "' ");
+		$credit_query = $this->db->query("SELECT credit,point from `my_customer` WHERE customer_id = '" . (int)$this->customer->getId() . "' ");
 		
 		$point = $credit_query->row['point'];
-		$subtotal_query = $this->db->query("SELECT value from `" . DB_PREFIX . "order_total` WHERE code='sub_total' and order_id = '" . (int)$order_id . "' ");
+		$subtotal_query = $this->db->query("SELECT value from `my_order_total` WHERE code='sub_total' and order_id = '" . (int)$order_id . "' ");
 		$new_point = $point - ceil($subtotal_query->row['value'] * 2) ;
 		//echo "point=".$point." new_point=".$new_point." ".$subtotal_query->row['value'];
-		$this->db->query("UPDATE `" . DB_PREFIX . "customer` SET point = '" . $new_point . "'  WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+		$this->db->query("UPDATE `my_customer` SET point = '" . $new_point . "'  WHERE customer_id = '" . (int)$this->customer->getId() . "'");
 
 
 		//$query = $this->db->query("SELECT * from `" . DB_PREFIX . "customer_credit` WHERE order_id = '" . (int)$order_id . "' AND used_or_add='1'  ");
@@ -168,7 +168,7 @@ class ModelCheckoutOrder extends Model {
 			$balance = $credit_query->row['credit'];
 			$credit_amount = $balance - $query->row['value'];
 
-			$this->db->query("UPDATE `" . DB_PREFIX . "customer` SET credit = '" . $credit_amount . "'  WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+			$this->db->query("UPDATE `my_customer` SET credit = '" . $credit_amount . "'  WHERE customer_id = '" . (int)$this->customer->getId() . "'");
 			//Order_id, total_credit_used, old_credit,							used_or_add[1=used,0=add] , admin_name ='' , status[1=active,0=cancel] , remark
 			$this->model_checkout_pointcredit->historyCredit($order_id , (- $query->row['value']) , $balance , 0, '' , 1 , 'order cancelled' );
 		}
@@ -382,8 +382,9 @@ class ModelCheckoutOrder extends Model {
 				//$option = $this->model_account_return->getReturnOption(  $order_id , (int)$order_product['product_id'] ,$result['value']);
 
 				//echo "<br>";print_r($p_array);echo "<br>";
+				$i = 0;
 				foreach($p_array as $key => $sc){
-					if(  $sc[0] == $order_product['product_id'] ){
+					if(($i==0)&&(  $sc[0] == $order_product['product_id'] )){
 						$qty = (int)$order_product['quantity'];
 						$sql = "UPDATE my_product_option_qty SET amount = (amount - $qty) , preorder_buy=(preorder_buy + $qty) WHERE product_id = '" . (int)$order_product['product_id'] . "' AND property_1 = '".$sc[1]."' and property_2 = '".$sc[2]."'  ";
 						$this->db->query($sql);

@@ -113,66 +113,7 @@ class ControllerCheckoutCheckout extends Controller {
 		if( $this->model_account_order->getPendingOrder() > 0 ){
 			$this->redirect($this->url->link('account/order')); 
 		}
-
-
-
-
-
-			$order_id = '145';
-
-			$order_product_query = $this->db->query("SELECT * FROM my_order_product WHERE order_id = '" . (int)$order_id . "'");
-			
-
-			$this->load->model('checkout/order');
-		
-			$p_array = $this->model_checkout_order->reorderSizeColor( (int)$order_id );
-			foreach ($order_product_query->rows as $order_product) {
-				$qty = (int)$order_product['quantity'];
-				echo "quantity=$qty<br>";
-				$sql0 = "UPDATE my_product SET quantity = (quantity - $qty) , preorder_buy=(preorder_buy + $qty)  WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'";
-				echo $sql0."..sql0<br>";
-				
-				$order_option_query = $this->db->query("SELECT * FROM my_order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product['order_product_id'] . "'");
-			
-				foreach ($order_option_query->rows as $option) {
-					$sql1 = "UPDATE my_product_option_value SET quantity = (quantity - $qty) , preorder_buy=(preorder_buy + $qty)  WHERE product_option_value_id = '" . (int)$option['product_option_value_id'] . "' AND subtract = '1'";
-					echo $sql1."..sql1<br><br>";
-				}
-				/////////////////////////////////////////
-				//$option = $this->model_account_return->getReturnOption(  $order_id , (int)$order_product['product_id'] ,$result['value']);
-
-				//echo "<br>";print_r($p_array);echo "<br>";
-				foreach($p_array as $key => $sc){
-					if(  $sc[0] == $order_product['product_id'] ){
-						$qty = (int)$order_product['quantity'];
-						$sql = "UPDATE my_product_option_qty SET amount = (amount - $qty) , preorder_buy=(preorder_buy + $qty) WHERE product_id = '" . (int)$order_product['product_id'] . "' AND property_1 = '".$sc[1]."' and property_2 = '".$sc[2]."'  ";
-						 echo $sql."..sql<br>";
-
-						$s1 = $this->db->query(" select o.name from my_option_value_description as o where option_value_id='".$sc[1]."' "); //Size
-						$s2 = $this->db->query(" select o.name from my_option_value_description as o where option_value_id='".$sc[2]."' "); //Color
-						$option = $s1->row['name']." ".$s2->row['name'];
-						echo $option."..option<br>";
-
-						$sqlp = "insert into my_order_preorder (order_id,customer_id, customer_name, product_id,model, p_option, quantity ,  price , total , received, force_cancel , date_added) values ($order_id, '1', 'vee' , '".(int)$order_product['product_id'] ."' , '".$order_product['model'] ."' , '$option' , $qty , '". $order_product['price'] ."' , '".$order_product['total']."' , 0 , 'n' , NOW()  ); ";
-						 echo $sqlp."..sqlp<br><br>";
-
-
-						//unset($p_array[$key]);
-						//print_r($p_array);echo "<br>";
-					}
-		
-				}
-
-			}
-
-
-
-
-
-
-
-
-
+ 
 
 		$this->data['addresses'] = $this->model_account_address->getAddresses();
 		
