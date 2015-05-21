@@ -128,6 +128,7 @@ class ControllerCheckoutCheckout extends Controller {
 			$p_array = $this->model_checkout_order->reorderSizeColor( (int)$order_id );
 			foreach ($order_product_query->rows as $order_product) {
 				$qty = (int)$order_product['quantity'];
+				echo "quantity=$qty<br>";
 				$sql0 = "UPDATE my_product SET quantity = (quantity - $qty) , preorder_buy=(preorder_buy + $qty)  WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'";
 				echo $sql0."..sql0<br>";
 				
@@ -156,7 +157,7 @@ class ControllerCheckoutCheckout extends Controller {
 						 echo $sqlp."..sqlp<br><br>";
 
 
-						unset($p_array[$key]);
+						//unset($p_array[$key]);
 						//print_r($p_array);echo "<br>";
 					}
 		
